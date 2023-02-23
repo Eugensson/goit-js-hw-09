@@ -5,16 +5,25 @@ const delayInput = form.querySelector('input[name="delay"]');
 const stepInput = form.querySelector('input[name="step"]');
 const amountInput = form.querySelector('input[name="amount"]');
 
-form.addEventListener('submit', onFormSubmit);
+const createPromise = (position, delay) => {
+  return new Promise((resolve, reject) => {
+    const shouldResolve = Math.random() > 0.3;
+    if (shouldResolve) {
+      resolve({ position, delay });
+    } else {
+      reject({ position, delay });
+    }
+  });
+};
 
-function onFormSubmit(e) {
+const onFormSubmit = e => {
   e.preventDefault();
-  const delayDefault = Number(delayInput.value);
+  const delayInputValue = Number(delayInput.value);
   const step = Number(stepInput.value);
   const amount = Number(amountInput.value);
 
   setTimeout(() => {
-    let delay = delayDefault;
+    let delay = delayInputValue;
     let position = 1;
 
     const timerId = setInterval(() => {
@@ -31,20 +40,11 @@ function onFormSubmit(e) {
       delay += step;
       position += 1;
 
-      if (position == amount + 1) {
+      if (position === amount + 1) {
         clearInterval(timerId);
       }
     }, step);
-  }, delayDefault);
-}
-
-const createPromise = (position, delay) => {
-  return new Promise((Fulfill, reject) => {
-    const shouldResolve = Math.random() > 0.3;
-    if (shouldResolve) {
-      Fulfill({ position, delay });
-    } else {
-      reject({ position, delay });
-    }
-  });
+  }, delayInputValue);
 };
+
+form.addEventListener('submit', onFormSubmit);
