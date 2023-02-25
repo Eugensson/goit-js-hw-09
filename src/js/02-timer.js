@@ -66,6 +66,6 @@ function onStartTimer() {
       clearInterval(intervalId);
     }
     convertMs(ms);
-    updateTimerDisplay(({ days, hours, minutes, seconds } = convertMs(ms)));
+    updateTimerDisplay(convertMs(ms));
   }, 1000);
 }
