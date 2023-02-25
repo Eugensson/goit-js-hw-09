@@ -27,18 +27,6 @@ flatpickr('input#datetime-picker', options);
 
 startButton.addEventListener('click', onStartTimer);
 
-function onStartTimer() {
-  startButton.setAttribute('disabled', 'true');
-  const intervalId = setInterval(() => {
-    const ms = selectedDates[0].getTime() - new Date().getTime();
-    if (Math.floor(ms / 1000) === 0) {
-      clearInterval(intervalId);
-    }
-    convertMs(ms);
-    updateTimerDisplay(({ days, hours, minutes, seconds } = convertMs(ms)));
-  }, 1000);
-}
-
 function convertMs(ms) {
   const second = 1000;
   const minute = second * 60;
@@ -68,4 +56,16 @@ function updateTimerDisplay({ days, hours, minutes, seconds }) {
   elements.hours.textContent = addLeadingZero(hours);
   elements.minutes.textContent = addLeadingZero(minutes);
   elements.seconds.textContent = addLeadingZero(seconds);
+}
+
+function onStartTimer() {
+  startButton.setAttribute('disabled', 'true');
+  const intervalId = setInterval(() => {
+    const ms = selectedDates[0].getTime() - new Date().getTime();
+    if (Math.floor(ms / 1000) === 0) {
+      clearInterval(intervalId);
+    }
+    convertMs(ms);
+    updateTimerDisplay(({ days, hours, minutes, seconds } = convertMs(ms)));
+  }, 1000);
 }
