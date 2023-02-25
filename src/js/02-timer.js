@@ -2,42 +2,42 @@ import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 import Notiflix from 'notiflix';
 
+const dateNow = new Date();
 const startButton = document.querySelector('[data-start]');
-onSetAttribute();
+let selectedDates = null;
+
+startButton.setAttribute('disabled', 'true');
 
 const options = {
   enableTime: true,
   time_24hr: true,
   defaultDate: new Date(),
   minuteIncrement: 1,
-  onClose(selectedDates) {
-    const dateNow = new Date();
-    const compareDate = dateNow - selectedDates[0];
-    if (compareDate >= 0) {
+  onClose(selected) {
+    selectedDates = selected;
+    if (dateNow.getTime() > selectedDates[0].getTime()) {
       Notiflix.Notify.failure('Please choose a date in the future');
     } else {
-      startButton.disabled = false;
-      const intervalId = setInterval(() => {
-        const dateNow = new Date();
-        const ms = selectedDates[0] - dateNow;
-        if (Math.round(ms / 1000) === 0) {
-          clearInterval(intervalId);
-        }
-        convertMs(ms);
-        const { days, hours, minutes, seconds } = convertMs(ms);
-        updateTimerDisplay({ days, hours, minutes, seconds });
-      }, 1000);
+      startButton.removeAttribute('disabled');
     }
   },
 };
 
-startButton.addEventListener('click', onSetAttribute);
-
-function onSetAttribute() {
-  startButton.disabled = true;
-}
-
 flatpickr('input#datetime-picker', options);
+
+startButton.addEventListener('click', onStartTimer);
+
+function onStartTimer() {
+  startButton.setAttribute('disabled', 'true');
+  const intervalId = setInterval(() => {
+    const ms = selectedDates[0].getTime() - new Date().getTime();
+    if (Math.floor(ms / 1000) === 0) {
+      clearInterval(intervalId);
+    }
+    convertMs(ms);
+    updateTimerDisplay(({ days, hours, minutes, seconds } = convertMs(ms)));
+  }, 1000);
+}
 
 function convertMs(ms) {
   const second = 1000;
@@ -53,6 +53,10 @@ function convertMs(ms) {
   return { days, hours, minutes, seconds };
 }
 
+function addLeadingZero(value) {
+  return String(value).padStart(2, '0');
+}
+
 function updateTimerDisplay({ days, hours, minutes, seconds }) {
   const elements = {
     days: document.querySelector('span[data-days]'),
@@ -64,8 +68,4 @@ function updateTimerDisplay({ days, hours, minutes, seconds }) {
   elements.hours.textContent = addLeadingZero(hours);
   elements.minutes.textContent = addLeadingZero(minutes);
   elements.seconds.textContent = addLeadingZero(seconds);
-}
-
-function addLeadingZero(value) {
-  return String(value).padStart(2, '0');
 }
